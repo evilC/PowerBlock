@@ -161,13 +161,26 @@ else
   echo "GPIO tools not available. Trying sysfs method." | write_log
 fi
 
-model=$(cat /proc/cpuinfo | grep 'Model' | cut -d ':' -f2 | xargs)
-echo "Detected RPi model: $model".
+# Detect Raspberry Pi type
+# cat /proc/cpuinfo can yield results such as:
+# Model           : Raspberry Pi 4 Model B Rev 1.1
+# Model           : Raspberry Pi 5 Model B Rev 1.0
+# Model           : Raspberry Pi Zero W Rev 1.1
+# If what is immediately after "Model" is a number, we can use that as the model number.
+# If not, we assume it is a Pi 4 or below (using GPIO chip 0).
+model_string=$(cat /proc/cpuinfo | grep 'Model' | awk '{print $5}')
+echo "Model string: $model_string"
+if ! [[ $model_string =~ $'^[0-9]+$' ]] ; then
+  echo "Detected RPi model: $model_string - Forcing model to 4 (Using GPIO chip as per RPi 4 or below)".
+  model=4
+else
+  echo "Detected RPi model: $model_string".
+  model=model_string
+fi
 
 # Determine Raspberry Pi GPIO access chip
 # chip=4 for RPi5, chip=0 for older models
-# Note this code would break on future models! (eg Rpi 6)
-if $GPIO_TOOLS_AVAILABLE && echo "$model" | grep -q "Raspberry Pi 5"; then
+if [ $GPIO_TOOLS_AVAILABLE ] && [ "$model" -gt 4 ]; then
   chip=4
 else
   chip=0
