@@ -169,7 +169,6 @@ fi
 # If what is immediately after "Model" is a number, we can use that as the model number.
 # If not, we assume it is a Pi 4 or below (using GPIO chip 0).
 model_string=$(cat /proc/cpuinfo | grep 'Model' | awk '{print $5}')
-echo "Model string: $model_string"
 if ! [[ $model_string =~ $'^[0-9]+$' ]] ; then
   echo "Detected RPi model: $model_string - Forcing model to 4 (Using GPIO chip as per RPi 4 or below)".
   model=4
