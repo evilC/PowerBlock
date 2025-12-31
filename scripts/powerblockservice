@@ -174,7 +174,7 @@ if ! [[ $model_string =~ $'^[0-9]+$' ]] ; then
   model=4
 else
   echo "Detected RPi model: $model_string".
-  model=model_string
+  model=$model_string
 fi
 
 # Determine Raspberry Pi GPIO access chip
