@@ -166,7 +166,7 @@ echo "Detected RPi model: $model".
 
 # Determine Raspberry Pi GPIO access chip
 # chip=4 for RPi5, chip=0 for older models
-# Note this code would break on future models (eg Rpi 6)
+# Note this code would break on future models! (eg Rpi 6)
 if $GPIO_TOOLS_AVAILABLE && echo "$model" | grep -q "Raspberry Pi 5"; then
   chip=4
 else
