@@ -165,14 +165,22 @@ fi
 # cat /proc/cpuinfo can yield results such as:
 # Model           : Raspberry Pi 4 Model B Rev 1.1
 # Model           : Raspberry Pi 5 Model B Rev 1.0
-# Model           : Raspberry Pi Zero W Rev 1.1
+# Model           : Raspberry Pi Zero 2 W Rev 1.0
 # If what is immediately after "Model" is a number, we can use that as the model number.
 # If not, we assume it is a Pi 4 or below (using GPIO chip 0).
 # !! This code may need updating eg if a new Zero model is released that uses GPIO chip 4.
 model_string=$(cat /proc/cpuinfo | grep 'Model' | awk '{print $5}')
 if ! [[ $model_string =~ $'^[0-9]+$' ]] ; then
-  echo "Detected RPi model: $model_string - Forcing model to 4 (Using GPIO chip as per RPi 4 or below)".
-  model=4
+  if ([ "$model_string" == "Zero" ]); then
+    model=$(cat /proc/cpuinfo | grep 'Model' | awk '{print $6}')
+    echo "Detected Raspberry Pi Zero - Using model of $model".
+  elif ([ "$model_string" == "Compute" ]); then
+    model=$(cat /proc/cpuinfo | grep 'Model' | awk '{print $7}')
+    echo "Detected Raspberry Pi Compute Module $model".
+  else
+    echo "Unknown Raspberry Pi model detected: $model_string - Forcing model to 4 (Using GPIO chip as per RPi 4 or below)".
+    model=4
+  fi
 else
   echo "Detected RPi model: $model_string".
   model=$model_string
